@@ -60,6 +60,8 @@ char** OpenInputAsStringArray() {
 	}
 
 	free(buffer);
+
+	res[lineCount] = NULL;
 	return res;
 }
 
