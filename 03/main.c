@@ -1,3 +1,5 @@
+#include <regex.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,8 +67,51 @@ char** OpenInputAsStringArray() {
 	return res;
 }
 
+#define mulRegText "mul\\([0-9][0-9]?[0-9]?,[0-9][0-9]?[0-9]?\\)"
+#define doRegText "(do\\(\\))"
+#define dontRegText "(don[']t\\(\\))"
+
 int32_t main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv) {
-	/* code */
+	const char* mulDoDontRegText = "(" mulRegText "|" doRegText "|" dontRegText ")";
+
+	regex_t mulRegex;
+	if (regcomp(&mulRegex, mulDoDontRegText, REG_EXTENDED)) exit(1);
+
+	char* input = OpenInputAsBuffer(NULL);
+	if (!input) {
+		regfree(&mulRegex);
+		exit(1);
+	}
+
+	char* tmp = input;
+	regmatch_t matchInfos = {0};
+	char* matchStr = NULL;
+
+	uint32_t totalMul = 0;
+	uint32_t totalEnabledMul = 0;
+	bool enabled = true;
+	while (!regexec(&mulRegex, tmp, 1, &matchInfos, 0)) {
+		matchStr = tmp + matchInfos.rm_so;
+
+		if (matchStr[0] == 'm') {
+			uint32_t lhs = atoi(strchr(matchStr, '(') + 1);
+			uint32_t rhs = atoi(strchr(matchStr, ',') + 1);
+			totalMul += lhs * rhs;
+			if (enabled) totalEnabledMul += lhs * rhs;
+		} else if (matchStr[2] == 'n') {
+			enabled = false;
+		} else {
+			enabled = true;
+		}
+
+		tmp += matchInfos.rm_eo;
+	}
+
+	printf("Total Mul : %u\n", totalMul);
+	printf("Total Enabled Mul : %u\n", totalEnabledMul);
+
+	free(input);
+	regfree(&mulRegex);
 
 	return 0;
 }
