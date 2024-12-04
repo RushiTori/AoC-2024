@@ -1,4 +1,4 @@
-NAME=Template
+NAME=CeresSearch
 
 build:
 	gcc main.c -o $(NAME).out -Wall -Wextra -Werror -g
