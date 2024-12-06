@@ -1,4 +1,4 @@
-NAME=Template
+NAME=GuardGallivant
 
 build:
 	gcc main.c -o $(NAME).out -Wall -Wextra -Werror -g
