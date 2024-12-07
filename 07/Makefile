@@ -1,7 +1,7 @@
-NAME=Template
+NAME=BridgeRepair
 
 build:
-	gcc main.c -o $(NAME).out -Wall -Wextra -Werror -g
+	gcc main.c -o $(NAME).out -Wall -Wextra -Werror -g -lm
 
 start: build
 	./$(NAME).out
