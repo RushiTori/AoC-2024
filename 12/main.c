@@ -223,8 +223,6 @@ int32_t main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv) {
 		exit(1);
 	}
 
-	printf("allocated %u patches\n", patchCount);
-
 	InitPatches(patches, &map);
 
 	uint32_t totalFencePrice = 0;
@@ -232,9 +230,6 @@ int32_t main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv) {
 	for (uint32_t i = 0; i < patchCount; i++) {
 		totalFencePrice += patches[i].perimeter * patches[i].area;
 		totalBulkFencePrice += patches[i].sideCount * patches[i].area;
-
-		printf("%c: %u, %u, %u\n", patches[i].crop, patches[i].perimeter, patches[i].area,
-			   patches[i].sideCount);
 	}
 
 	printf("The total price for fences is : %u\n", totalFencePrice);
