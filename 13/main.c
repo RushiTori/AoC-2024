@@ -160,7 +160,6 @@ int32_t main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv) {
 	ClawMachine* machines = ParseClawMachines(input, &machineCount);
 
 	for (uint32_t i = 0; input[i]; i++) {
-		printf("%s\n", input[i]);
 		free(input[i]);
 	}
 	free(input);
