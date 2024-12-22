@@ -65,8 +65,75 @@ char** OpenInputAsStringArray() {
 	return res;
 }
 
+#define PRUNE(num) ((num)&0xFFFFFFLLU)
+#define MIX(a, b) ((a) ^ (b))
+
+uint64_t Hash(uint64_t num) {
+	num = PRUNE(MIX(num, num << 6));
+	num = PRUNE(MIX(num, num >> 5));
+	num = PRUNE(MIX(num, num << 11));
+	return num;
+}
+
+int64_t* CreateMemo(uint32_t size) {
+	int64_t* memo = malloc(sizeof(int64_t) * size);
+	return memo;
+}
+
 int32_t main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv) {
-	/* code */
+	const uint32_t memoLen = (1 << 20) + 1;
+	int64_t* totalMemo = CreateMemo(memoLen);
+	int64_t* tempMemo = CreateMemo(memoLen);
+
+	if (!totalMemo || !tempMemo) {
+		free(totalMemo);
+		free(tempMemo);
+		exit(1);
+	}
+
+	char** input = OpenInputAsStringArray();
+	if (!input) {
+		free(totalMemo);
+		free(tempMemo);
+		exit(1);
+	}
+
+	memset(totalMemo, 0, sizeof(int64_t) * memoLen);
+
+	uint64_t totalRand = 0;
+	for (uint32_t i = 0; input[i]; i++) {
+		uint64_t code = atoll(input[i]);
+		uint64_t next = code;
+
+		uint32_t diffIdx = 0;
+		memset(tempMemo, -1, sizeof(int64_t) * memoLen);
+		for (uint32_t j = 0; j < 2000; j++) {
+			next = Hash(code);
+			diffIdx = ((diffIdx & 0x7FFF) << 5) | (((next % 10) - (code % 10)) & 0x1F);
+			code = next;
+
+			if (j < 3) continue;
+			if (tempMemo[diffIdx] == -1) tempMemo[diffIdx] = code % 10;
+		}
+		totalRand += code;
+
+		for (uint32_t j = 0; j < memoLen; j++) {
+			if (tempMemo[j] != -1) totalMemo[j] += tempMemo[j];
+		}
+
+		free(input[i]);
+	}
+
+	int64_t bestBanana = 0;
+	for (uint32_t i = 0; i < memoLen; i++) {
+		if (totalMemo[i] > bestBanana) bestBanana = totalMemo[i];
+	}
+	free(input);
+	free(totalMemo);
+	free(tempMemo);
+
+	printf("total secret code : %lu\n", totalRand);
+	printf("best banana profit : %lu\n", bestBanana);
 
 	return 0;
 }

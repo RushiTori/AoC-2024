@@ -1,4 +1,4 @@
-NAME=Template
+NAME=MonkeyMarket
 
 build:
 	gcc main.c -o $(NAME).out -Wall -Wextra -Werror -g
